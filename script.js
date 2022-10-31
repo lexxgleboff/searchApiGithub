@@ -1,62 +1,66 @@
-// fetch('https://jsonplaceholder.typicode.com/posts')
-//     .then(response => response.json())
-//     .then(posts => console.log(posts))
-//     .catch(e => console.log(e))
+const search = document.querySelector('.form__search')
+const autocompliteList = document.querySelector('.autocomplite')
+const wrap = document.querySelector('.wrapper')
+
 const debounce = (fn, debounceTime) => {
-    let timer
-    return function() {
-        const fnCall = () => fn.apply(this, arguments)
-        clearTimeout(timer)
-        timer = setTimeout(fnCall, debounceTime)
-    }
-};
-
-function createEl(tag, classEl) {
-    let element = document.createElement(tag)
-    if (classEl) element.classList.add(classEl)
-    return element
+  let timer
+  return function () {
+    const fnCall = () => fn.apply(this, arguments)
+    clearTimeout(timer)
+    timer = setTimeout(fnCall, debounceTime)
+  }
 }
 
-// const wrap = createEl('div', 'wrap')
-// document.body.appendChild(wrap)
-
-let search = document.querySelector('.form__search')
-let autocomplite = document.querySelector('.autocomplite')
-let autocompliteItem = document.querySelector('.autocomplite__item')
-
-search.addEventListener('keyup', debounce(getRepo, 250))
-
-function getRepo(e) {
-    if (e.target.value) {
-        return fetch(`https://api.github.com/search/repositories?q=${e.target.value}&per_page=5`)
-            .then(response => response.json())
-            .then(rep => {
-                let arr = []
-                rep.items.forEach(item => {
-                    let { name, stargazers_count, owner: { login } } = item
-                    arr.push('<li class="autocomplite__item">' + name + '</li>')
-                    // console.log(`name: ${name}, star: ${stargazers_count}, owner: ${login}`);  
-                    // console.log(arr);
-                    showResultSearch(arr)
-                    autocomplite.style.display = 'block'
-                })
-            })
-            .catch(e => console.log(e))
-        
-    } else {
-        search.innerHTML = ''
-        autocomplite.style.display = 'none'
-    }
-    
+function createElement(tag, classElement) {
+  let element = document.createElement(tag)
+  if (classElement) element.classList.add(classElement)
+  return element
 }
 
+search.addEventListener('keyup', debounce(getRepository, 300))
 
-function showResultSearch(list) {
-    let listData
-    if (!list.length) {
-        listData = search.value
-    } else {
-        listData = list.join('')
-    }
-    autocomplite.innerHTML = listData
+function getRepository(e) {
+    autocompliteList.innerHTML = ''
+  if (e.target.value) {
+    return fetch(
+      `https://api.github.com/search/repositories?q=${e.target.value}&per_page=5`
+    )
+      .then((response) => response.json())
+      .then((rep) => {
+        console.log(rep)
+        rep.items.forEach((item) => showResultSearch(item))
+        autocompliteList.style.display = 'block'
+      })
+      .catch((e) => console.log(e))
+  } else {
+    e.target.value = ''
+    autocompliteList.innerHTML = ''
+    autocompliteList.style.display = 'none'
+  }
+}
+
+function showResultSearch(item) {
+  let {
+    name,
+    stargazers_count,
+    owner: { login }
+  } = item
+  let autocompliteItem = createElement('li', 'autocomplite__item')
+  autocompliteItem.innerHTML = `${name}`
+  let btnRemove = createElement('div', 'btn__remove')
+  autocompliteList.appendChild(autocompliteItem)
+
+  autocompliteItem.addEventListener('click', () => {
+    let item = createElement('div', 'item')
+    item.innerHTML = `<div class="item__info"><span>Name: ${name}</span><span>Owner: ${login}</span><span>Stars: ${stargazers_count}</span></div>`
+    item.appendChild(btnRemove)
+    wrap.appendChild(item)
+
+    item.addEventListener('click', (e) => {
+      if (e.target.matches('.btn__remove')) item.remove()
+    })
+
+    search.value = ''
+    autocompliteList.innerHTML = ''
+  })
 }
