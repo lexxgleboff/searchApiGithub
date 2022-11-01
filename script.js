@@ -12,7 +12,7 @@ const debounce = (fn, debounceTime) => {
 }
 
 function createElement(tag, classElement) {
-  let element = document.createElement(tag)
+  const element = document.createElement(tag)
   if (classElement) element.classList.add(classElement)
   return element
 }
