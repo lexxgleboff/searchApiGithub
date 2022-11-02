@@ -17,7 +17,7 @@ function createElement(tag, classElement) {
   return element
 }
 
-search.addEventListener('input', debounce(getRepository, 0))
+search.addEventListener('input', debounce(getRepository, 500))
 
 function getRepository(e) {
     if (e.target.value) {
