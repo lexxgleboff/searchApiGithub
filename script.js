@@ -17,18 +17,18 @@ function createElement(tag, classElement) {
   return element
 }
 
-search.addEventListener('input', debounce(getRepository, 500))
+search.addEventListener('input', debounce(getRepository, 0))
 
 function getRepository(e) {
-  autocompliteList.innerHTML = ''
-  if (e.target.value) {
-    return fetch(
-      `https://api.github.com/search/repositories?q=${e.target.value}&per_page=5`
-    )
-      .then((response) => response.json())
-        .then((rep) => {
-        rep.items.forEach((item) => showResultSearch(item))
-        autocompliteList.style.display = 'block'
+    if (e.target.value) {
+        return fetch(
+            `https://api.github.com/search/repositories?q=${e.target.value}&per_page=5`
+            )
+            .then((response) => response.json())
+            .then((rep) => {
+                autocompliteList.innerHTML = ''
+                rep.items.forEach((item) => showResultSearch(item))
+                autocompliteList.style.display = 'block'
       })
       .catch((e) => console.log(e))
   } else {
